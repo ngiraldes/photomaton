@@ -92,47 +92,31 @@ def ledflash():
     for i in range(0, ledStrip.nLeds):
         ledStrip.setPixel(i, [255, 255, 255])
         ledStrip.update()
-        time.sleep(0.0005)
+        time.sleep(0.0001)
 
 def led_off():
     for i in range(0, ledStrip.nLeds):
         ledStrip.setPixel(i, [0, 0, 0])
         ledStrip.update()
-        time.sleep(0.0005)
+        time.sleep(0.0001)
 
 def fillAll2(ledStrip, color):
     for i in range(0, ledStrip.nLeds):
         ledStrip.setPixel(i, color)
         ledStrip.update()
-        time.sleep(0.0005)
+        time.sleep(0.0001)
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:
-        nrOfleds = 5 
+        nrOfleds = 100
     else:
         nrOfleds = int(sys.argv[1])
-    #delayTime = 0.001
+    delayTime = 0.01
 
     ledStrip = LedStrip_WS2801(nrOfleds)
 
     while 1:
-        print("Flash") 
-        ledflash()
-        time.sleep(2)
-        #led_off()
-        #time.sleep(3)
-        print("Rouge") 
-        fillAll2(ledStrip, [255, 0, 0])
-        time.sleep(2)
-        print("Vert") 
-        fillAll2(ledStrip, [0, 255, 0]) 
-        time.sleep(2)
-        print("Bleu") 
-        fillAll2(ledStrip, [0, 0, 255]) 
-        time.sleep(2)
-        #print("Bleu-0,01") 
-        #fillAll(ledStrip, [0, 0, 255], 0.01) 
-        #time.sleep(2)
         led_off()
-        time.sleep(2)
+        #time.sleep(2)
+        exit()

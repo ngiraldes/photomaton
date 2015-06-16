@@ -19,10 +19,11 @@ import shutil
 import glob
 import sys
 import time
+from datetime import datetime
+import picamera
 
 ##led control
 from LedStrip_WS2801 import LedStrip_WS2801
-
 
 
 ##Force screen size
@@ -188,6 +189,16 @@ class finish(Screen):
     
 class montage(Screen):
     pass
+
+#################################################
+# set variables
+#################################################
+##pictures_folder = "/media/camera/DCIM/" used for USB
+pictures_folder = "/home/pi/photomaton/photos/"
+bgpicture_file = "/home/pi/photomaton/fond.jpg"
+temp_folder = "/home/pi/photomaton/temp/"
+output_folder = "/home/pi/photomaton/montages/"
+
     
 #################################################
 #   Start of main App
@@ -220,6 +231,14 @@ class MainApp(App):
 
     def take_picture(*largs):
         print("photo")
+        camera = picamera.PiCamera()
+        camera.resolution = (2048, 1536)
+        #camera.start_preview()
+        filename = datetime.now().strftime("%Y%m%d-%H%M%S") + ".JPG"
+        camera.capture(pictures_folder + filename)
+        #camera.stop_preview()
+        camera.close()
+        ## used with Panasonic remote
         #Clock.schedule_once(partial(gpio_set, 23, True))
         #Clock.schedule_once(partial(gpio_set, 23, False), 0.7)
 
@@ -299,13 +318,14 @@ class MainApp(App):
         print('----------------')        
         self.root.current = 'photos'
         Clock.schedule_once(self.light_on)
-        self.photoshoot = 4
+        self.photoshoot = 3
         Clock.schedule_once(self.take_picture, 1)
         Clock.schedule_interval(self.photos_shoot, 3)
+        #Clock.schedule_once(self.photos_shoot)
         
     def photos_shoot(self, *args):
         self.photoshoot = self.photoshoot - 1
-        #Clock.schedule_once(self.take_picture)
+        Clock.schedule_once(self.take_picture)
         if self.photoshoot == 0:
             Clock.unschedule(self.photos_shoot)
             Clock.schedule_once(self.light_off)
@@ -317,22 +337,22 @@ class MainApp(App):
         self.root.current = 'finish'
         #Clock.schedule_once(light_off)
         #GPIO.output(24, True)
-        #Clock.schedule_once(self.montage_screen, 3)
+        Clock.schedule_once(self.montage_screen, 1)
             
     def montage_screen(self, *args):
         print('montage !!!!!')
         print('-----------------')
         self.root.current = 'montage'
-        '''if os.access(pictures_folder, os.R_OK):
+        if os.access(pictures_folder, os.R_OK):
         #Copy youngest 4 jpg files from camera
             for fileName in self.listLastModified(pictures_folder,4,"\.JPG"):
                 shutil.copy(fileName,temp_folder)
-            GPIO.output(24, False)
+        #    GPIO.output(24, False)
 
         # List pictures in temp dir
         pictures_files = os.listdir(temp_folder)
-        #print('pictures files:')
-        #print(pictures_files)
+        print('pictures files:')
+        print(pictures_files)
 
         # Open pictures
         os.chdir(temp_folder)
@@ -350,8 +370,8 @@ class MainApp(App):
 
         # Make the montage
         bgpicture = Image.open(bgpicture_file)
-        bgpicture.paste(picture1,(100,200))
-        bgpicture.paste(picture2,(2248,200))
+        bgpicture.paste(picture1,(100,100))
+        bgpicture.paste(picture2,(2248,100))
         bgpicture.paste(picture3,(100,1736))
         bgpicture.paste(picture4,(2248,1736))
         bgpicture.save(output_folder + out)
@@ -359,7 +379,7 @@ class MainApp(App):
         #Clean temporary folder
         for f in pictures_files:
             #print( f + " deleted")
-            os.remove(f)'''
+            os.remove(f)
     
         #Go back to first screen
         self.root.current = 'ready'
